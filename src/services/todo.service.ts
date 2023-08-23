@@ -11,16 +11,11 @@ export class ToDoService {
     }
 
     public async createToDo(toDoData: ToDo): Promise<ToDo> {
-        if (!toDoData.todoDescription) throw new Error("Todo description is null!")
-
         const createToDoData: ToDo = await database().insert({...toDoData}).into(DatabaseEnum.DATABASE_TABLE_NAME);
         return createToDoData;
     }
 
     public async updateToDo(toDoId: number, toDoData: ToDo): Promise<ToDo> {
-        if (isNaN(toDoId)) throw new Error("Todo Id is not a number!")
-        if (!toDoData.todoDescription) throw new Error("Todo description is null!")
-
         const todo: ToDo[] = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME).where('id', '=', toDoId);
         if (!todo) throw new Error("Cannot find todo!")
 
@@ -31,8 +26,6 @@ export class ToDoService {
     }
 
     public async deleteToDo(toDoId: number): Promise<ToDo> {
-        if (isNaN(toDoId)) throw new Error("Todo Id is not a number!")
-
         const todo = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME).where('id', "=", toDoId).first()
         if (!todo) throw new Error("Cannot find todo!")
 
