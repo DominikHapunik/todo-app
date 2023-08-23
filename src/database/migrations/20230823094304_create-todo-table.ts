@@ -5,7 +5,7 @@ import { DatabaseEnum } from "../../enums/database.enum";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable(DatabaseEnum.DATABASE_TABLE_NAME, tabel => {
         tabel.increments('id').primary();
-        tabel.string('todo_description');
+        tabel.string('todoDescription');
         tabel.timestamp('createdAt').defaultTo(knex.fn.now())
     })
 }

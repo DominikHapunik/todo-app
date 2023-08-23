@@ -8,11 +8,11 @@ const configs: { [key: string]: Knex.Config } = {
     connection: {
       charset: 'utf8',
       timezone: 'UTC',
-      user: DB_USER,
-      password: DB_PASSWORD,
-      host: DB_HOST,
-      port: parseInt(DB_PORT!),
-      database: DB_DATABASE,
+      user: "root",
+      password: "root",
+      host: 'localhost',
+      port: 3306,
+      database: "test",
     },
     migrations: {
       directory: './migrations',
