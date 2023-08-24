@@ -1,6 +1,7 @@
 import { ToDoService } from "../services/todo.service";
 import { NextFunction, Request, Response } from "express";
 import { ToDo } from "../interfaces/todo.intereface";
+import { isNumber, isString } from "class-validator";
 
 export class ToDoController {
     public todo = new ToDoService();
@@ -18,6 +19,11 @@ export class ToDoController {
     public createToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const toDoData: ToDo = req.body;
+            if (!isString(toDoData.todoDescription)) {
+                res.status(400).json({ data: null, message: "todo description must be a string!", error: true})
+                return;
+            } 
+
             const createToDoData: ToDo = await this.todo.createToDo(toDoData); 
 
             res.status(201).json({ data: createToDoData, message: 'created' })
@@ -27,8 +33,14 @@ export class ToDoController {
     }
 
     public updateToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        try {
+        try {   
+            
             const toDoData: ToDo = req.body;
+            if (!isNumber(toDoData.id)) {
+                res.status(400).json({ data: null, message: "todo id must be a number!", error: true})
+                return;
+            }
+
             const toDoId = Number(req.params.id)
             const updatedToDoData: ToDo = await this.todo.updateToDo(toDoId, toDoData)
                 
@@ -40,10 +52,15 @@ export class ToDoController {
 
     public deleteToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const toDoId = Number(req.params.id);
-            const deleteToDoData: ToDo = await this.todo.deleteToDo(toDoId);
+            const todoId = Number(req.params.id);
+            if (!isNumber(todoId)) {
+                res.status(400).json({ data: null, message: "todo id must be a number!", error: true})
+                return;
+            }
 
-            res.status(200).json({ data: deleteToDoData, message: "deleted"})
+            const deleteTodoData: ToDo = await this.todo.deleteToDo(todoId);
+
+            res.status(200).json({ data: deleteTodoData, message: "deleted"})
         } catch (err) {
             next(err)
         }
