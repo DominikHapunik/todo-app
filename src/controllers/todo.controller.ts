@@ -1,68 +1,68 @@
-import { ToDoService } from "../services/todo.service";
+import { TodoService } from "../services/todo.service";
 import { NextFunction, Request, Response } from "express";
-import { ToDo } from "../interfaces/todo.intereface";
-import { isNumber, isString } from "class-validator";
+import { ITodo } from "../interfaces/todo.intereface";
+import { ApiResponse } from "../types/apiresponse.type";
 
 export class ToDoController {
-    public todo = new ToDoService();
+    public todoService = new TodoService();
 
-    public getAllToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    public getAllTodo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const findAllToDos: ToDo[] = await this.todo.findAllToDo();
+            const findAllToDos: ITodo[] = await this.todoService.findAllTodo();
+            const jsonResponse: ApiResponse<ITodo[]> = { data: findAllToDos, message: 'getAllTodo' }
 
-            res.status(200).json({ data: findAllToDos, message: "findAll" })
+            res.status(200).json(jsonResponse);
         } catch (err) {
-            next(err)
+            const jsonResponse: ApiResponse<null> = { message: 'getAllTodo ' + err, error: true }
+
+            res.status(400).json(jsonResponse);
+            next(err);
         }
     }
 
-    public createToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    public createTodo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const toDoData: ToDo = req.body;
-            if (!isString(toDoData.todoDescription)) {
-                res.status(400).json({ data: null, message: "todo description must be a string!", error: true})
-                return;
-            } 
+            const todoData: ITodo = req.body;
+            const createToDoData: ITodo = await this.todoService.createTodo(todoData);
+            const jsonResponse: ApiResponse<ITodo> = { data: createToDoData, message: 'createTodo' };
 
-            const createToDoData: ToDo = await this.todo.createToDo(toDoData); 
-
-            res.status(201).json({ data: createToDoData, message: 'created' })
+            res.status(200).json(jsonResponse);
         } catch (err) {
-            next(err)
+            const jsonResponse: ApiResponse<null> = { message: 'createTodo ' + err, error: true }
+
+            res.status(400).json(jsonResponse);
+            next(err);
         }
     }
 
-    public updateToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        try {   
-            
-            const toDoData: ToDo = req.body;
-            if (!isNumber(toDoData.id)) {
-                res.status(400).json({ data: null, message: "todo id must be a number!", error: true})
-                return;
-            }
+    public updateTodo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const todoId: number = Number(req.params.id);
+            const todoData: ITodo = req.body;
+            const updatedToDoData: ITodo = await this.todoService.updateTodo(todoId, todoData);
+            const jsonResponse: ApiResponse<ITodo> = { data: updatedToDoData, message: 'updateTodo' }
 
-            const toDoId = Number(req.params.id)
-            const updatedToDoData: ToDo = await this.todo.updateToDo(toDoId, toDoData)
-                
-            res.status(200).json({ data: updatedToDoData, message: "updated"})
+            res.status(200).json(jsonResponse);
         } catch (err) {
-            next(EvalError)
+            const jsonResponse: ApiResponse<null> = { message: 'updateTodo ' + err, error: true }
+
+            res.status(400).json(jsonResponse);
+            next(err);
         }
     }
 
-    public deleteToDo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    public deleteTodo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const todoId = Number(req.params.id);
-            if (!isNumber(todoId)) {
-                res.status(400).json({ data: null, message: "todo id must be a number!", error: true})
-                return;
-            }
+            const todoId: number = Number(req.params.id);
+            const deleteTodoData: ITodo = await this.todoService.deleteTodo(todoId);
+            const jsonResponse: ApiResponse<ITodo> = { data: deleteTodoData, message: 'deleteTodo' }
 
-            const deleteTodoData: ToDo = await this.todo.deleteToDo(todoId);
-
-            res.status(200).json({ data: deleteTodoData, message: "deleted"})
+            res.status(200).json(jsonResponse);
         } catch (err) {
-            next(err)
+            const jsonResponse: ApiResponse<null> = { message: 'deleteTodo ' + err, error: true }
+
+            res.status(400).json(jsonResponse);
+            next(err);
         }
     }
 }

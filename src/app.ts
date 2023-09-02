@@ -1,12 +1,14 @@
 import express from 'express';
 import { PORT } from '../src/config/index'
-import { Routes } from './interfaces/routes.interface';
+import { IRoutes } from './interfaces/routes.interface';
+import helmet from 'helmet'
+import cookieParser from 'cookie-parser';
 
 export class App {
     public app: express.Application
     public port: string | number;
 
-    constructor(routes: Routes[]) {
+    constructor(routes: IRoutes[]) {
         this.app = express();
         this.port = PORT || 3000;
 
@@ -27,9 +29,11 @@ export class App {
     private initializeMiddlewares() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(helmet())
+        this.app.use(cookieParser())
     }
 
-    private intializeRoutes(routes: Routes[]) {
+    private intializeRoutes(routes: IRoutes[]) {
         routes.forEach(route => {
             this.app.use('/', route.router)
         });

@@ -1,36 +1,36 @@
-import { ToDo } from "../interfaces/todo.intereface";
+import { ITodo } from "../interfaces/todo.intereface";
 import { DatabaseEnum } from "../enums/database.enum";
 
-import { database } from "../database/db";
-import { HttpException } from "../exeptions/httpException";
+import { database, databaseTodoTabel } from "../database/db";
+import { HttpException } from "../exeptions/http.exception";
 
-export class ToDoService {
-    public async findAllToDo(): Promise<ToDo[]> {
-        const todo: ToDo[] = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME)
-        
+export class TodoService {
+    public async findAllTodo(): Promise<ITodo[]> {
+        const todo: ITodo[] = await databaseTodoTabel().select();
+
         return todo;
     }
 
-    public async createToDo(toDoData: ToDo): Promise<ToDo> {
-        const createToDoData: ToDo = await database().insert({...toDoData}).into(DatabaseEnum.DATABASE_TABLE_NAME);
+    public async createTodo(todoData: ITodo): Promise<ITodo> {
+        const createToDoData: ITodo = await databaseTodoTabel().insert({...todoData});
         return createToDoData;
     }
 
-    public async updateToDo(toDoId: number, toDoData: ToDo): Promise<ToDo> {
-        const todo: ToDo[] = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME).where('id', '=', toDoId);
+    public async updateTodo(todoId: number, todoData: ITodo): Promise<ITodo> {
+        const todo: ITodo = await databaseTodoTabel().where('id', "=", todoId).first()
         if (!todo) throw new HttpException(409, "Cannot find todo!")
+        
+        await databaseTodoTabel().update({ ...todoData }).where('id', '=', todoId);
 
-        await database().update({ ...toDoData }).where('id', '=', toDoId).into(DatabaseEnum.DATABASE_TABLE_NAME);
-
-        const updatedToDoData: ToDo = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME).where('id', '=', toDoId).first()
-        return updatedToDoData;
+        const updatedTodoData: ITodo = await databaseTodoTabel().where('id', '=', todoId).first()
+        return updatedTodoData;
     }
 
-    public async deleteToDo(toDoId: number): Promise<ToDo> {
-        const todo = await database().select().from(DatabaseEnum.DATABASE_TABLE_NAME).where('id', "=", toDoId).first()
+    public async deleteTodo(todoId: number): Promise<ITodo> {
+        const todo = await databaseTodoTabel().where('id', "=", todoId).first()
         if (!todo) throw new HttpException(409, "Cannot find todo!")
 
-        await database().delete().where("id", "=", toDoId).into(DatabaseEnum.DATABASE_TABLE_NAME)
+        await database().delete().where("id", "=", todoId).into(DatabaseEnum.DATABASE_TODO_TABLE_NAME)
         return todo;
     }
 } 

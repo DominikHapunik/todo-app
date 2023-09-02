@@ -7,10 +7,9 @@ const configs: { [key: string]: Knex.Config } = {
     client: 'mysql2',
     connection: {
       charset: 'utf8',
-      timezone: 'UTC',
       user: "root",
       password: "root",
-      host: 'localhost',
+      host: "localhost",
       port: 3306,
       database: "test",
     },
